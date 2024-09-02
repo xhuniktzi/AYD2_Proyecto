@@ -388,9 +388,25 @@ Se usará para “esconder” la llamada de multiples querys a la base de datos 
 
 ### Panel principal
 
+![image.png](assets/image%2012.png)
+
 ### Lista de Solicitud de Viajes
 
+![image.png](assets/image%2013.png)
+
 ### Detalles del Viaje
+
+![image.png](assets/image%2014.png)
+
+### Resumen de Ganancias
+
+![image.png](assets/image%2015.png)
+
+### Configuración 1
+
+![image.png](assets/image%2016.png)
+
+![image.png](assets/image%2017.png)
 
 ### EndPoints 2
 
@@ -408,13 +424,19 @@ Se usará para “esconder” la llamada de multiples querys a la base de datos 
 
 ### Panel principal 1
 
-### Lista de Solicitudes Empleo
+![image.png](assets/image%2018.png)
 
-### Lista de Solicitudes de Usuario
+### Lista de Solicitudes Empleo Conductores
+
+![image.png](assets/image%2019.png)
+
+### Lista de Usuarios
+
+![image.png](assets/image%2020.png)
 
 ### Reportes
 
-### Vista de reportes
+![image.png](assets/image%2021.png)
 
 ### EndPoints 3
 
@@ -424,17 +446,19 @@ Se usará para “esconder” la llamada de multiples querys a la base de datos 
 - `DELETE /asistentes/usuarios/{id}`: Dar de baja a un usuario.
 - `GET /asistentes/reportes`: Obtener reportes de problemas.
 
-## Pantalla Asistente 1
-
-### Pantalla Segunda Verificación
+## Pantalla Administrador
 
 ### Panel principal 2
 
-### Estadisticas de la aplicación
-
-### Reportes Generados de usuarios/conductores
+![image.png](assets/image%2022.png)
 
 ### Gestión de Asistentes
+
+![image.png](assets/image%2023.png)
+
+### Calificaciones
+
+![image.png](assets/image%2024.png)
 
 ### EndPoints 4
 
