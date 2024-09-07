@@ -5,6 +5,11 @@ name = "pypi"
 
 [packages]
 flask = "*"
+psycopg2 = "*"
+flask-jwt-extended = "*"
+flask-sqlalchemy = "*"
+flask-migrate = "*"
+python-dotenv = "*"
 
 [dev-packages]
 yapf = "*"
