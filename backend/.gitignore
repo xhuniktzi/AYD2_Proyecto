@@ -1,0 +1,54 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Environment variables
+.env
+
+# pipenv
+Pipfile.lock
+
+# Flask instance folder
+instance/
+*.sqlite
+
+# Pytest cache
+.pytest_cache/
+
+# Migrations: no ignoramos la carpeta pero ignoramos archivos temporales
+migrations/versions/*.pyc
+migrations/versions/__pycache__/
+
+# Flask cache and session files
+flask_session/
+.flaskenv
+
+# VS Code settings (optional, for users of Visual Studio Code)
+.vscode/
+
+# IDEs and editors
+.idea/
+*.swp
+*.swo
+*.swn
+*~
+
+# MacOS specific files
+.DS_Store
+
+# Python virtual environments
+venv/
+env/
+.venv/
+
+# Logs
+*.log
+*.out
+*.err
+
+# Database dumps
+*.sql
