@@ -1,9 +1,9 @@
-import random
+
 from flask import Blueprint, request, jsonify
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_jwt_extended import create_access_token
-from app.models import User, db
-from app.utils import read_config
+from app.models import TokenCheckin, User, db
+from app.utils import generar_nombre_usuario, read_config, generar_token_verificacion, obtener_fechas
 
 
 auth = Blueprint('auth', __name__)
@@ -31,14 +31,7 @@ def auth_login():
     
 @auth.route('/register', methods=['POST'])
 def auth_register():
-    adjetivos = ['Amazing', 'Brave', 'Calm', 'Daring', 'Energetic', 'Friendly', 'Gentle']
-    sustantivos = ['Lion', 'Tiger', 'Eagle', 'Shark', 'Falcon', 'Panda', 'Dragon']
-
-    def generar_nombre_usuario():
-        adjetivo = random.choice(adjetivos)
-        sustantivo = random.choice(sustantivos)
-        numero = random.randint(1, 99)  # Puedes agregar un número al final si lo deseas
-        return f"{adjetivo}{sustantivo}{numero}"
+    
     
     data = request.get_json()
     fullname = data['fullname']
@@ -56,17 +49,17 @@ def auth_register():
     new_user.genero_id = genero # 0 is nothing, 1 is female, 2 is male
     new_user.email = email
     new_user.phone_number = phone
-    new_user.state_id = int(read_config("user-active"))
+    new_user.state_id = int(read_config("user-not-checkin"))
 
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({"msg": "Usuario registrado"})
-
-
-
-
+    new_token = TokenCheckin()
+    new_token.token = generar_token_verificacion()
+    new_token.user_id = int(new_user.id)
+    new_token.created_at, new_token.expires_at = obtener_fechas()
     
+    db.session.add(new_token)
+    db.session.commit()
 
-
-
+    return jsonify({"msg": "Usuario registrado"})

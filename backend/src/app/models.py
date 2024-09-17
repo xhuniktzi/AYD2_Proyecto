@@ -29,6 +29,12 @@ class Trip(db.Model):
     destination = db.Column(db.String(120), nullable=False)
     status = db.Column(db.String(50), nullable=False)
 
+class TokenCheckin(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    token = db.Column(db.String(40), nullable=False, unique=True)
+    expires_at =  db.Column(db.DateTime, nullable=False)
+    created_at =  db.Column(db.DateTime, nullable=False)
 
 # Config
 class ConfigControl(db.Model):
