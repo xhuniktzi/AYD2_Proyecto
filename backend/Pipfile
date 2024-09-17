@@ -11,6 +11,7 @@ flask-sqlalchemy = "*"
 flask-migrate = "*"
 python-dotenv = "*"
 flask-cors = "*"
+tzdata = "*"
 
 [dev-packages]
 yapf = "*"

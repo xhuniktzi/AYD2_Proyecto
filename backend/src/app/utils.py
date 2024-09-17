@@ -35,7 +35,7 @@ def generar_nombre_usuario():
 
 def obtener_fechas():
     # Crear objeto ZoneInfo para la zona horaria especificada
-    zona = ZoneInfo('America/Guatemala_City')
+    zona = ZoneInfo('America/Guatemala')
     
     # Obtener la fecha y hora actual en la zona horaria
     fecha_actual = datetime.now(tz=zona)
