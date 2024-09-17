@@ -45,3 +45,9 @@ def obtener_fechas():
     
     return fecha_actual, fecha_mas_24_horas
 
+def formatear_fecha(fecha_str: str) -> datetime:
+    try:
+        return datetime.strptime(fecha_str, "%d/%m/%Y")
+    except ValueError:
+        return None
+

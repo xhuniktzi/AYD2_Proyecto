@@ -7,6 +7,7 @@ from app.utils import (
     read_config,
     generar_token_verificacion,
     obtener_fechas,
+    formatear_fecha
 )
 from datetime import datetime  # Import necesario para manejar fechas
 
@@ -45,11 +46,12 @@ def auth_register():
     email = data["email"]
     phone = data["phone"]
 
-    # Convertir la fecha de nacimiento al formato datetime
-    try:
-        fecha_nac = datetime.strptime(fecha_nac_str, "%d/%m/%Y")
-    except ValueError:
+
+    fecha_nac = formatear_fecha(fecha_nac_str)
+
+    if not fecha_nac:
         return jsonify({"msg": "Formato de fecha inválido. Utiliza dd/mm/yyyy"}), 400
+    
 
     new_user = User()
     new_user.username = generar_nombre_usuario()
