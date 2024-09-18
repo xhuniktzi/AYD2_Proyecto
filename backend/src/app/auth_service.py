@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from sqlalchemy import or_
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_jwt_extended import create_access_token
 from app.models import TokenCheckin, User, db
@@ -7,6 +8,7 @@ from app.utils import (
     read_config,
     generar_token_verificacion,
     obtener_fechas,
+    formatear_fecha,
 )
 from datetime import datetime  # Import necesario para manejar fechas
 
@@ -20,15 +22,19 @@ def auth_login():
     email = data.get("email")
     password = data.get("password")
 
-    user = User.query.filter_by(username=username).first()
-
-    if not user:
-        user = User.query.filter_by(email=email).first()
+    user = User.query.filter(
+        or_(User.username == username, User.email == email)
+    ).first()
 
     if not user:
         return jsonify({"msg": "Bad credentials"}), 401
 
-    if check_password_hash(user.password, password):
+    if user.state_id == int(read_config("user-not-checkin")):
+        return jsonify({"msg": "Usuario no verificado"}), 401
+
+    if check_password_hash(user.password, password) and user.state_id == int(
+        read_config("user-active")
+    ):
         access_token = create_access_token(identity=user.id)
         return jsonify(access_token=access_token), 200
     else:
@@ -45,11 +51,17 @@ def auth_register():
     email = data["email"]
     phone = data["phone"]
 
-    # Convertir la fecha de nacimiento al formato datetime
-    try:
-        fecha_nac = datetime.strptime(fecha_nac_str, "%d/%m/%Y")
-    except ValueError:
+    fecha_nac = formatear_fecha(fecha_nac_str)
+
+    if not fecha_nac:
         return jsonify({"msg": "Formato de fecha inválido. Utiliza dd/mm/yyyy"}), 400
+
+    user_exists = User.query.filter(
+        or_(User.email == email, User.phone_number == phone)
+    ).first()
+
+    if user_exists:
+        return jsonify({"msg": "User exists"}), 400
 
     new_user = User()
     new_user.username = generar_nombre_usuario()
@@ -110,9 +122,9 @@ def forgot_password():
     username = data.get("username")
 
     # Buscar el usuario por email
-    user = User.query.filter_by(email=email).first()
-    if not user:
-        user = User.query.filter_by(username=username).first()
+    user = user = User.query.filter(
+        or_(User.username == username, User.email == email)
+    ).first()
 
     if not user:
         return jsonify({"msg": "No se encontró una cuenta con ese email"}), 404
