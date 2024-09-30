@@ -2,6 +2,7 @@ from flask import Flask
 
 from app.extensions import db, jwt, migrate, cors
 from app.auth_service import auth
+from app.user_service import user
 
 
 def create_app():
@@ -15,6 +16,7 @@ def create_app():
 
     # Registrar blueprints
     app.register_blueprint(auth, url_prefix='/api/auth')
+    app.register_blueprint(user, url_prefix='/api/user')
 
 
     return app
