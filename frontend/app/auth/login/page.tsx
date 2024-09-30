@@ -36,7 +36,7 @@ export default function LoginPage() {
             localStorage.setItem('access_token', access_token)
 
             // Redirect to the desired page after successful login
-            router.push('/')
+            router.push('/user/request')
         } catch (error) {
             const axiosError = error as AxiosError<IMessageRes>
 

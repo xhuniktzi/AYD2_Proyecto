@@ -7,3 +7,20 @@ export const axiosInstance: AxiosInstance = axios.create({
       'Content-Type': 'application/json'
     }
   })
+
+  // Interceptor de Axios para agregar el token JWT a cada petición
+axiosInstance.interceptors.request.use(
+  (config) => {
+    // Obtener el token de localStorage o sessionStorage
+    const token = localStorage.getItem('access_token');
+    
+    if (token) {
+      // Si hay un token, se agrega a los headers de Authorization
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
