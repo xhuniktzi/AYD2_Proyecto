@@ -90,7 +90,8 @@ def upgrade():
         batch_op.alter_column('status',
                existing_type=sa.VARCHAR(length=50),
                type_=sa.Integer(),
-               existing_nullable=False)
+               existing_nullable=False,
+               postgresql_using="status::integer")  # Agregamos la conversión explícita
         batch_op.create_foreign_key(None, 'trip_state', ['status'], ['id'])
         batch_op.create_foreign_key(None, 'driver', ['driver_id'], ['id'])
 
