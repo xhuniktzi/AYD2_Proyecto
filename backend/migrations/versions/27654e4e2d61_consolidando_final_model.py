@@ -1,8 +1,8 @@
-"""Consolidate model
+"""Consolidando final model
 
-Revision ID: 0479851a8196
+Revision ID: 27654e4e2d61
 Revises: 
-Create Date: 2024-09-30 19:14:02.532901
+Create Date: 2024-09-30 20:45:27.211357
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '0479851a8196'
+revision = '27654e4e2d61'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -152,19 +152,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    with op.batch_alter_table('trip', schema=None) as batch_op:
-        batch_op.add_column(sa.Column('driver_id', sa.Integer(), nullable=True))
-        batch_op.add_column(sa.Column('start_time', sa.DateTime(), nullable=False))
-        batch_op.add_column(sa.Column('end_time', sa.DateTime(), nullable=True))
-        batch_op.add_column(sa.Column('tarifa', sa.Float(), nullable=False))
-        batch_op.alter_column('status',
-               existing_type=sa.VARCHAR(length=50),
-               type_=sa.Integer(),
-               existing_nullable=False,
-               postgresql_using="status::integer")  # Agregamos la conversión explícita
-        batch_op.create_foreign_key(None, 'trip_state', ['status'], ['id'])
-        batch_op.create_foreign_key(None, 'driver', ['driver_id'], ['id'])
-
     # ### end Alembic commands ###
 
 
