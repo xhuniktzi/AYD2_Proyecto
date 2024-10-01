@@ -1,6 +1,6 @@
 INSERT INTO public.config_control ("name",value) VALUES
-	 ('user-active','0'),
-	 ('user-not-checkin','1'),
+	 ('user-active','1'),
+	 ('user-not-checkin','2'),
 	 ('trip-pending','1'),
 	 ('trip-canceled','2'),
 	 ('trip-accept','3'),
