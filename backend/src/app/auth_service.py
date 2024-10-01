@@ -14,6 +14,10 @@ from datetime import datetime  # Import necesario para manejar fechas
 
 auth = Blueprint("auth", __name__)
 
+# Realiza un hola server
+@auth.route("/hello", methods=["GET"])
+def hello():
+    return jsonify({"msg": "Hello, server!"})
 
 @auth.route("/login", methods=["POST"])
 def auth_login():

@@ -152,6 +152,19 @@ def upgrade():
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    with op.batch_alter_table('trip', schema=None) as batch_op:
+        batch_op.add_column(sa.Column('driver_id', sa.Integer(), nullable=True))
+        batch_op.add_column(sa.Column('start_time', sa.DateTime(), nullable=False))
+        batch_op.add_column(sa.Column('end_time', sa.DateTime(), nullable=True))
+        batch_op.add_column(sa.Column('tarifa', sa.Float(), nullable=False))
+        batch_op.alter_column('status',
+               existing_type=sa.VARCHAR(length=50),
+               type_=sa.Integer(),
+               existing_nullable=False,
+               postgresql_using="status::integer")  # Agregamos la conversión explícita
+        batch_op.create_foreign_key(None, 'trip_state', ['status'], ['id'])
+        batch_op.create_foreign_key(None, 'driver', ['driver_id'], ['id'])
+
     # ### end Alembic commands ###
 
 
