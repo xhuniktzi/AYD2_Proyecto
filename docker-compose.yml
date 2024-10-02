@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   backend:
     build:
@@ -9,6 +8,11 @@ services:
       - "5000:5000"
     environment:
       - DATABASE_URL=postgresql://sa:database123!@db:5432/uberfake
+    develop:
+      watch:
+        - action: sync
+          path: ./backend/
+          target: /app
     depends_on:
       db:
         condition: service_healthy
@@ -22,6 +26,11 @@ services:
     container_name: frontend_service
     ports:
       - "3000:3000"
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend/
+          target: /app
     depends_on:
       - backend
     networks:
@@ -38,8 +47,11 @@ services:
       - "5432:5432"
     networks:
       - app-network
+    volumes:
+      - db-volume:/var/lib/postgresql/data
+      - ./database:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sa"]
+      test: ["CMD-SHELL", "pg_isready -U sa -d uberfake"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -47,3 +59,6 @@ services:
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  db-volume:
