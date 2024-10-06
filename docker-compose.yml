@@ -49,7 +49,6 @@ services:
       - app-network
     volumes:
       - db-volume:/var/lib/postgresql/data
-      - ./database:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U sa -d uberfake"]
       interval: 10s
