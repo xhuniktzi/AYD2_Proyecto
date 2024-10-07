@@ -8,7 +8,6 @@ INSERT INTO public.config_control ("name",value) VALUES
 	 ('user-not-checkin','2'),
 	 ('trip-pending','1'),
 	 ('trip-canceled','2'),
-	 ('trip-indrive','3'),
 	 ('trip-complete','4'),	 
 	 ('report-open','1'),
 	 ('trip-accept', '3');

@@ -1,192 +1,78 @@
-"use client";
-import { axiosInstance } from "@/tools/api";
-import { AxiosError } from "axios";
-import User from "@/models/IUser";
-import Trip from "@/models/AssistantUsersTripsRes";
-import { IMessageRes } from "@/models/IMessageRes";
-import { useState, useEffect } from "react";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { User as UserIcon, MapPin, MapPinCheckInside } from "lucide-react";
+'use client'
+import { useState, useEffect } from 'react';
+import { axiosInstance } from '@/tools/api';
+import { useRouter } from 'next/navigation';
+import { ITripDriverInfo } from '@/models/ITripDriverInfo';
+import { AxiosError } from 'axios';
+import { IMessageRes } from '@/models/IMessageRes';
 
-export default function UserPage() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [userTrips, setUserTrips] = useState<Trip[]>([]);
-  const [errMsg, setErrMsg] = useState("");
-  const [open, setOpen] = useState(false);
-  const [userDetails, setUserDetails] = useState<User>({
-    id: 0,
-    fullname: "",
-    username: "",
-    fecha_nac: "",
-    genero: "",
-    email: "",
-    phone_number: "",
-    state: "",
-  });
+export default function TripInfoListPage() {
+  const [trips, setTrips] = useState<ITripDriverInfo[]>([]);
+  const [errorMsg, setErrorMsg] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
-    axiosInstance
-      .get<User[]>("/driver/users")
-      .then((response) => {
-        console.log(response.data);
-        setUsers(response.data);
-      })
-      .catch((error) => {
-        const axiosError = error as AxiosError<IMessageRes>;
-        if (axiosError.response) {
-          setErrMsg(axiosError.response.data.msg);
-        } else {
-          setErrMsg("Un error inesperado ha ocurrido");
-        }
-      });
-  }, []);
-
-  async function getUserDetails(id: number) {
-    try {
-      const response = await axiosInstance.get<User>(`/user_trip/${id}`);
-      setUserDetails(response.data);
-      getTrips(id);
-      setOpen(true);
-    } catch (error) {
-      const axiosError = error as AxiosError<IMessageRes>;
-      if (axiosError.response) {
-        setErrMsg(axiosError.response.data.msg);
-      } else {
-        setErrMsg("Un error inesperado ha ocurrido");
+    async function fetchTrips() {
+      try {
+        const response = await axiosInstance.get<ITripDriverInfo[]>('/driver/trips');
+        setTrips(response.data);
+      } catch (error) {
+        console.error('Error fetching trips', error);
       }
     }
-  }
+    // Initial fetch
+    fetchTrips();
+  }, []);
 
-  async function getTrips(id: number) {
+  async function handleAcceptTrip(tripId: number) {
     try {
-      const response = await axiosInstance.get<Trip[]>(
-        `/assistant/users/${id}/trips`
-      );
-      setUserTrips(response.data);
+      await axiosInstance.post<IMessageRes>(`/driver/accept_trip`, { trip_id: tripId, driver_id: 1 });
+      router.push(`/driver/driver_trip/${tripId}`)
     } catch (error) {
       const axiosError = error as AxiosError<IMessageRes>;
       if (axiosError.response) {
-        setErrMsg(axiosError.response.data.msg);
+        setErrorMsg(axiosError.response.data.msg);
       } else {
-        setErrMsg("Un error inesperado ha ocurrido");
+        setErrorMsg('An unexpected error occurred.');
       }
     }
   }
 
   return (
-    <>
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent>
-          <SheetHeader className="mb-5">
-            <SheetTitle>Detalle cliente</SheetTitle>
-          </SheetHeader>
-          <div className="flex">
-            <UserIcon />
-            <h2 className="text-lg font-bold">{userDetails.fullname}</h2>
-          </div>
-          {Object.entries(userDetails)
-            .filter(([key, _]) => key !== "fullname" && key !== "id")
-            .map(([key, value]) => (
-              <div key={key}>
-                <h3 className="text font-semibold">
-                  {key.replaceAll("_", " ")}
-                </h3>
-                <p className="text-sm">{value}</p>
-              </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="w-full max-w-4xl p-8 space-y-6 bg-white shadow-md rounded-lg">
+        {errorMsg && <p className="text-red-500 text-center">{errorMsg}</p>}
+        <h1 className="text-3xl font-bold text-center text-gray-800">Trips List</h1>
+        <table className="w-full table-auto">
+          <thead>
+            <tr>
+              <th className="px-4 py-2">Trip ID</th>
+              <th className="px-4 py-2">Origin</th>
+              <th className="px-4 py-2">Destination</th>
+              <th className="px-4 py-2">Tarifa</th>
+              <th className="px-4 py-2">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {trips.map((trip) => (
+              <tr key={trip.trip_id}>
+                <td className="border px-4 py-2">{trip.trip_id}</td>
+                <td className="border px-4 py-2">{trip.origin}</td>
+                <td className="border px-4 py-2">{trip.destination}</td>
+                <td className="border px-4 py-2">Q{trip.tarifa}</td>
+                <td className="border px-4 py-2">
+                  <button
+                    onClick={() => handleAcceptTrip(trip.trip_id)}
+                    className="py-2 px-4 border rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">
+                    Accept Trip
+                  </button>
+                </td>
+              </tr>
             ))}
-          <h2 className="text-lg font-bold mt-5">Viajes</h2>
-          <hr className="border-black mb-3" />
-          {userTrips.length > 0 ? (
-            userTrips.map((trip) => (
-              <div key={trip.id}>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{trip.driver}</CardTitle>
-                    <CardDescription>{trip.start_time}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <span className="font-semibold">
-                      <MapPin className="inline" /> Origen
-                    </span>
-                    <p>{trip.origin}</p>
-                    <span className="font-semibold">
-                      <MapPinCheckInside className="inline" /> Destino
-                    </span>
-                    <p>{trip.destination}</p>
-                  </CardContent>
-                  <CardFooter>
-                    <span className="font-bold">{trip.status}</span>
-                  </CardFooter>
-                </Card>
-                
-              </div>
-            ))
-          ) : (
-            <p>No hay viajes</p>
-          )}
-          <hr className="border-2 my-3" />
-          <Button variant={"destructive"}>Eliminar cliente</Button>
-        </SheetContent>
-      </Sheet>
-
-      <h1 className="text-lg font-bold">Users</h1>
-      {errMsg && (
-        <Alert variant="destructive">
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{errMsg}</AlertDescription>
-        </Alert>
-      )}
-      {!errMsg && (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>id</TableHead>
-              <TableHead>Nombre</TableHead>
-              <TableHead>email</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>{user.id}</TableCell>
-                <TableCell>
-                  <Button
-                    variant={"link"}
-                    onClick={() => getUserDetails(user.id)}
-                  >
-                    {user.fullname}
-                  </Button>
-                </TableCell>
-                <TableCell>{user.email}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
-    </>
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }

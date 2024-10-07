@@ -40,7 +40,7 @@ def accept_trip():
     trip_id = data.get("trip_id")
     driver_id = data.get("driver_id")
 
-    trip = Trip.query.filter_by(id=trip_id, status=int(read_config('trip-accept'))).first()  # 3 = Aceptado o en progreso
+    trip = Trip.query.filter_by(id=trip_id, status=int(read_config('trip-pending'))).first()  # 3 = Aceptado o en progreso
     if not trip:
         return jsonify({"msg": "Viaje no disponible o ya aceptado"}), 400
 
@@ -59,12 +59,12 @@ def cancel_trip():
     driver_id = data.get("driver_id")
     reason = data.get("reason")
 
-    trip = Trip.query.filter_by(id=trip_id, driver_id=driver_id, status=int(read_config('trip-pending'))).first()  #1 = pendiente
+    trip = Trip.query.filter_by(id=trip_id, driver_id=driver_id, status=int(read_config('trip-accept'))).first()  #1 = pendiente
     #No se encontro el viaje o no se puede cancelar
     if not trip:
         return jsonify({"msg": "No se puede cancelar este viaje"}), 400
 
-    trip.status = 1  # 1 = cancelado
+    trip.status = read_config('trip-canceled')  # 1 = cancelado
     trip.cancellation_reason = reason
     db.session.commit()
 
@@ -99,7 +99,7 @@ def report_problem():
 
 
 # Ver información del usuario
-@driver.route("/user_trip/<int:trip_id>", methods=["GET"])
+@driver.route("/user_trip/<trip_id>", methods=["GET"])
 def get_user_info_by_trip(trip_id):
     trip = Trip.query.filter_by(id=trip_id).first()
 
@@ -139,6 +139,7 @@ def end_trip():
     trip.end_time = datetime.now()
     trip.status = 4  # 4 = finalizado
     trip.payment_received = payment_received
+    db.session.delete(trip)
     db.session.commit()
 
     return jsonify({"msg": "Viaje finalizado"}), 200

@@ -14,7 +14,7 @@ export default function DriverLayout({
         <ul className="flex space-x-5">
           <li>
             <Button variant={"ghost"} asChild>
-              <a href="list_trip">Lista de Viajes</a>
+              <a href="/driver/dashboard">Lista de Viajes</a>
             </Button>
           </li>
           <li>

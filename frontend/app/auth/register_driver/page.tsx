@@ -52,7 +52,7 @@ export default function RegisterDriverPage() {
         }
 
         try {
-            const response = await axiosInstance.post<IRegisterDriverRes>('/auth/login_driver', registerData)
+            const response = await axiosInstance.post<IRegisterDriverRes>('/auth/register_driver', registerData)
             const { driver_id } = response.data
 
             // Set the generated driver ID and show the modal
@@ -73,9 +73,8 @@ export default function RegisterDriverPage() {
     // Function to handle modal close and redirect to login
     const handleModalClose = () => {
         setShowModal(false)
-        router.push('/auth/login')
+        router.push('/auth/login_driver')
     }
-
     return (
         <>
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
