@@ -1,5 +1,13 @@
 from app.extensions import db
 
+# Modelo de Administrador
+class Administrador(db.Model):
+    ID_Administrador = db.Column(db.Integer, primary_key=True)
+    Nombre_Completo = db.Column(db.String(200), nullable=False)
+    Correo = db.Column(db.String(100), unique=True, nullable=False)
+    Contraseña = db.Column(db.String(100), nullable=False)
+    Archivo_TextoPlano = db.Column(db.String(200), nullable=True)
+
 # Modelos de Estado
 class UserState(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -107,3 +115,4 @@ class ConfigControl(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
     value = db.Column(db.String(120), nullable=False)
+

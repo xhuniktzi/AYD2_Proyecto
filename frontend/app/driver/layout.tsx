@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "Conductor - QNave",
 };
 
-export default function AssistantLayout({
+export default function DriverLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (

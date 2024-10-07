@@ -1,3 +1,8 @@
+INSERT INTO public.administrador 
+("Nombre_Completo", "Correo", "Contraseña", "Archivo_TextoPlano") 
+VALUES 
+('Juan Pérez', 'juan.perez@example.com', 'password123', 'ArchivoEjemplo.txt');
+
 INSERT INTO public.config_control ("name",value) VALUES
 	 ('user-active','1'),
 	 ('user-not-checkin','2'),
@@ -5,7 +10,8 @@ INSERT INTO public.config_control ("name",value) VALUES
 	 ('trip-canceled','2'),
 	 ('trip-indrive','3'),
 	 ('trip-complete','4'),	 
-	 ('report-open','1');
+	 ('report-open','1'),
+	 ('trip-accept', '3');
 
 INSERT INTO public.gender ("name",abreviature) VALUES
 	 ('null','N'),

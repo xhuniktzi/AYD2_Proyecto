@@ -3,6 +3,7 @@ from sqlalchemy import or_
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_jwt_extended import create_access_token
 from app.models import Driver, TokenCheckin, User, db
+from app.models import Administrador, db
 from app.utils import (
     generar_nombre_usuario,
     read_config,
@@ -19,6 +20,28 @@ auth = Blueprint("auth", __name__)
 @auth.route("/hello", methods=["GET"])
 def hello():
     return jsonify({"msg": "Hello, server!"})
+
+# Endpoint para login de administrador
+@auth.route("/admin/login", methods=["POST"])
+def admin_login():
+    data = request.get_json()
+    email = data.get("email")
+    password = data.get("password")
+
+    # Buscar al administrador por correo
+    admin = Administrador.query.filter_by(Correo=email).first()
+    print(admin)
+
+    if not admin:
+        return jsonify({"msg": "Administrador no encontrado"}), 404
+
+    # Verificar contraseña
+    if admin.Contraseña != password:
+        return jsonify({"msg": "Credenciales incorrectaszzz"}), 401
+
+    # Si las credenciales son correctas, generar un token de acceso
+    access_token = create_access_token(identity=admin.ID_Administrador)
+    return jsonify(access_token=access_token), 200
 
 
 @auth.route("/login", methods=["POST"])
@@ -239,3 +262,37 @@ def register_driver():
     db.session.commit()
 
     return jsonify({"msg": "Conductor registrado", "driver_id": new_driver.id}), 200
+
+
+# Endpoint for driver login
+@auth.route('/driver/login', methods=['POST'])
+def driver_login():
+    data = request.get_json()
+    dpi_number = data.get('dpi_number')
+    email = data.get('email')
+    password = data.get('password')
+
+    if not password:
+        return jsonify({"msg": "Password is required"}), 400
+
+    # Find driver by DPI number or email
+    driver = None
+    if dpi_number:
+        driver = Driver.query.filter_by(dpi_number=dpi_number).first()
+    elif email:
+        driver = Driver.query.filter_by(email=email).first()
+
+    if not driver:
+        return jsonify({"msg": "Driver not found"}), 404
+
+    # Check if driver is active TODO
+    # if driver.state_id != int(read_config("user-active")):
+    #     return jsonify({"msg": "Driver is not active"}), 403
+
+    # Check password
+    if not check_password_hash(driver.password, password):
+        return jsonify({"msg": "Incorrect credentials"}), 401
+
+    # Generate access token
+    access_token = create_access_token(identity=driver.id)
+    return jsonify(access_token=access_token), 200

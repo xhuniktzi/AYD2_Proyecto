@@ -2,6 +2,8 @@ from flask import Blueprint, request, jsonify
 from app.models import Driver, Trip, ProblemReport,User, db
 from datetime import datetime
 
+from app.utils import read_config
+
 driver = Blueprint("driver", __name__)
 #Obtener lista de viajes
 @driver.route("/trips", methods=["GET"])
@@ -14,7 +16,6 @@ def get_trips():
     trip_list = []
     for trip in trips:
         user = User.query.filter_by(id=trip.user_id).first()
-        driver = Driver.query.filter_by(id=trip.driver_id).first()
 
         trip_info = {
             "trip_id": trip.id,
@@ -39,12 +40,12 @@ def accept_trip():
     trip_id = data.get("trip_id")
     driver_id = data.get("driver_id")
 
-    trip = Trip.query.filter_by(id=trip_id, status=2).first()  # 3 = Aceptado o en progreso
+    trip = Trip.query.filter_by(id=trip_id, status=int(read_config('trip-accept'))).first()  # 3 = Aceptado o en progreso
     if not trip:
         return jsonify({"msg": "Viaje no disponible o ya aceptado"}), 400
 
     trip.driver_id = driver_id
-    trip.status = 3  # 3 = Aceptado o en progreso
+    trip.status = int(read_config('trip-accept'))  # 3 = Aceptado o en progreso
     db.session.commit()
 
     return jsonify({"msg": "Viaje aceptado"}), 200
@@ -58,7 +59,7 @@ def cancel_trip():
     driver_id = data.get("driver_id")
     reason = data.get("reason")
 
-    trip = Trip.query.filter_by(id=trip_id, driver_id=driver_id, status=1).first()  #1 = pendiente
+    trip = Trip.query.filter_by(id=trip_id, driver_id=driver_id, status=int(read_config('trip-pending'))).first()  #1 = pendiente
     #No se encontro el viaje o no se puede cancelar
     if not trip:
         return jsonify({"msg": "No se puede cancelar este viaje"}), 400
@@ -84,7 +85,7 @@ def report_problem():
         user_id=user_id,
         trip_id=trip_id,
         description=description,
-        status=1  # Status inicial "Pendiente"
+        status=int(read_config('report-open'))  # Status inicial "Pendiente"
     )
 
     db.session.add(new_report)
@@ -131,7 +132,7 @@ def end_trip():
     driver_id = data.get("driver_id")
     payment_received = data.get("payment_received")
 
-    trip = Trip.query.filter_by(id=trip_id, driver_id=driver_id, status=3).first()  # 3 = en progreso
+    trip = Trip.query.filter_by(id=trip_id, driver_id=driver_id, status=int(read_config('trip-accept'))).first()  # 3 = en progreso
     if not trip:
         return jsonify({"msg": "No se puede finalizar este viaje"}), 400
 
