@@ -1,3 +1,8 @@
+INSERT INTO public.administrador 
+("Nombre_Completo", "Correo", "Contraseña", "Archivo_TextoPlano") 
+VALUES 
+('Juan Pérez', 'juan.perez@example.com', 'password123', 'ArchivoEjemplo.txt');
+
 INSERT INTO public.config_control ("name",value) VALUES
 	 ('user-active','1'),
 	 ('user-not-checkin','2'),

@@ -152,6 +152,17 @@ def upgrade():
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+
+    # Add Administrador table
+    op.create_table('administrador',
+    sa.Column('ID_Administrador', sa.Integer(), nullable=False),
+    sa.Column('Nombre_Completo', sa.String(length=200), nullable=False),
+    sa.Column('Correo', sa.String(length=100), nullable=False),
+    sa.Column('Contraseña', sa.String(length=100), nullable=False),
+    sa.Column('Archivo_TextoPlano', sa.String(length=200), nullable=True),
+    sa.PrimaryKeyConstraint('ID_Administrador'),
+    sa.UniqueConstraint('Correo')
+    )
     # ### end Alembic commands ###
 
 
@@ -170,4 +181,7 @@ def downgrade():
     op.drop_table('gender')
     op.drop_table('driver_state')
     op.drop_table('config_control')
+    
+    # Drop Administrador table
+    op.drop_table('administrador')
     # ### end Alembic commands ###
