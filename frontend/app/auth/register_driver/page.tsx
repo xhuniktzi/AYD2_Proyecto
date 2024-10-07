@@ -52,7 +52,7 @@ export default function RegisterDriverPage() {
         }
 
         try {
-            const response = await axiosInstance.post<IRegisterDriverRes>('/auth/register_driver', registerData)
+            const response = await axiosInstance.post<IRegisterDriverRes>('/auth/login_driver', registerData)
             const { driver_id } = response.data
 
             // Set the generated driver ID and show the modal
