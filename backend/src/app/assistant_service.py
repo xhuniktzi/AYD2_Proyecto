@@ -4,6 +4,7 @@ from app.models import User, Driver, Gender, UserState, Trip, TripState
 from app.utils import read_config
 from app.models import db
 
+
 assistant = Blueprint('assistant', __name__)
 
 @assistant.route('/applicants', methods=['GET'])

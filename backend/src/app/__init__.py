@@ -4,7 +4,7 @@ from app.extensions import db, jwt, migrate, cors
 from app.auth_service import auth
 from app.user_service import user
 from app.assistant_service import assistant
-
+from app.driver_service import driver
 
 def create_app():
     app = Flask(__name__)
@@ -19,6 +19,6 @@ def create_app():
     app.register_blueprint(auth, url_prefix='/api/auth')
     app.register_blueprint(user, url_prefix='/api/user')
     app.register_blueprint(assistant, url_prefix='/api/assistant')
-
+    app.register_blueprint(driver, url_prefix='/api/driver')
 
     return app
