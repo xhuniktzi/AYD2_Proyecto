@@ -3,6 +3,7 @@ from sqlalchemy import or_
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_jwt_extended import create_access_token
 from app.models import Driver, TokenCheckin, User, db
+from app.models import Administrador, db
 from app.utils import (
     generar_nombre_usuario,
     read_config,
@@ -19,6 +20,28 @@ auth = Blueprint("auth", __name__)
 @auth.route("/hello", methods=["GET"])
 def hello():
     return jsonify({"msg": "Hello, server!"})
+
+# Endpoint para login de administrador
+@auth.route("/admin/login", methods=["POST"])
+def admin_login():
+    data = request.get_json()
+    email = data.get("email")
+    password = data.get("password")
+
+    # Buscar al administrador por correo
+    admin = Administrador.query.filter_by(Correo=email).first()
+    print(admin)
+
+    if not admin:
+        return jsonify({"msg": "Administrador no encontrado"}), 404
+
+    # Verificar contraseña
+    if admin.Contraseña != password:
+        return jsonify({"msg": "Credenciales incorrectaszzz"}), 401
+
+    # Si las credenciales son correctas, generar un token de acceso
+    access_token = create_access_token(identity=admin.ID_Administrador)
+    return jsonify(access_token=access_token), 200
 
 
 @auth.route("/login", methods=["POST"])
