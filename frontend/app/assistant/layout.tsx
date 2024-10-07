@@ -19,6 +19,11 @@ export default function AssistantLayout({
           </li>
           <li>
             <Button variant={"ghost"} asChild>
+              <a href="drivers">Conductores</a>
+            </Button>
+          </li>
+          <li>
+            <Button variant={"ghost"} asChild>
               <a href="applicants">Solicitudes empleo</a>
             </Button>
           </li>
