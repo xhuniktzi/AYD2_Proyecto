@@ -10,7 +10,8 @@ INSERT INTO public.config_control ("name",value) VALUES
 	 ('trip-canceled','2'),
 	 ('trip-indrive','3'),
 	 ('trip-complete','4'),	 
-	 ('report-open','1');
+	 ('report-open','1'),
+	 ('trip-accept', '3');
 
 INSERT INTO public.gender ("name",abreviature) VALUES
 	 ('null','N'),
