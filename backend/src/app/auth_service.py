@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from sqlalchemy import or_
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_jwt_extended import create_access_token
-from app.models import TokenCheckin, User, db
+from app.models import Driver, TokenCheckin, User, db
 from app.models import Administrador, db
 from app.utils import (
     generar_nombre_usuario,
@@ -14,6 +14,7 @@ from app.utils import (
 from datetime import datetime  # Import necesario para manejar fechas
 
 auth = Blueprint("auth", __name__)
+
 
 # Realiza un hola server
 @auth.route("/hello", methods=["GET"])
@@ -41,6 +42,7 @@ def admin_login():
     # Si las credenciales son correctas, generar un token de acceso
     access_token = create_access_token(identity=admin.ID_Administrador)
     return jsonify(access_token=access_token), 200
+
 
 @auth.route("/login", methods=["POST"])
 def auth_login():
@@ -201,3 +203,62 @@ def reset_password():
     db.session.commit()
 
     return jsonify({"msg": "Contraseña restablecida exitosamente"}), 200
+
+
+@auth.route("/register_driver", methods=["POST"])
+def register_driver():
+    data = request.get_json()
+    fullname = data["fullname"]
+    age = data["age"]
+    dpi_number = data["dpi_number"]
+    password = data["password"]
+    email = data["email"]
+    phone = data["phone"]
+    address = data["address"]
+    genero_id = data["genero_id"]  # 0: ninguno, 1: femenino, 2: masculino
+    estado_civil_id = data["estado_civil_id"]  # Estado civil del conductor
+    car_brand = data["car_brand"]
+    car_model_year = data["car_model_year"]
+    plate_number = data["plate_number"]
+    cv_pdf = data["cv_pdf"]
+    photo = data["photo"]
+    car_photo = data["car_photo"]
+    account_number = data["account_number"]
+
+    # Verificar si el DPI, email o número de teléfono ya existen
+    driver_exists = Driver.query.filter(
+        or_(
+            Driver.dpi_number == dpi_number,
+            Driver.email == email,
+            Driver.phone_number == phone,
+        )
+    ).first()
+
+    if driver_exists:
+        return jsonify({"msg": "El conductor ya está registrado"}), 400
+
+    # Crear una nueva instancia de Driver
+    new_driver = Driver()
+    new_driver.fullname = fullname
+    new_driver.age = age
+    new_driver.dpi_number = dpi_number
+    new_driver.password = generate_password_hash(password)
+    new_driver.email = email
+    new_driver.phone_number = phone
+    new_driver.address = address
+    new_driver.genero_id = genero_id
+    new_driver.estado_civil_id = estado_civil_id
+    new_driver.car_brand = car_brand
+    new_driver.car_model_year = car_model_year
+    new_driver.plate_number = plate_number
+    new_driver.cv_pdf = cv_pdf
+    new_driver.photo = photo
+    new_driver.car_photo = car_photo
+    new_driver.account_number = account_number
+    new_driver.state_id = int(read_config("user-not-checkin")) # Estado inicial del conductor
+
+    # Agregar el nuevo conductor a la base de datos
+    db.session.add(new_driver)
+    db.session.commit()
+
+    return jsonify({"msg": "Conductor registrado", "driver_id": new_driver.id}), 200

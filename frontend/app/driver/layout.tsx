@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "Asistente - QNave",
+  title: "Conductor - QNave",
 };
 
 export default function AssistantLayout({
@@ -14,17 +14,12 @@ export default function AssistantLayout({
         <ul className="flex space-x-5">
           <li>
             <Button variant={"ghost"} asChild>
-              <a href="users">Usuarios</a>
+              <a href="list_trip">Lista de Viajes</a>
             </Button>
           </li>
           <li>
             <Button variant={"ghost"} asChild>
-              <a href="drivers">Conductores</a>
-            </Button>
-          </li>
-          <li>
-            <Button variant={"ghost"} asChild>
-              <a href="applicants">Solicitudes empleo</a>
+              <a href="reports">Reportar Problema</a>
             </Button>
           </li>
         </ul>
