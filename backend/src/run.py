@@ -2,5 +2,6 @@ from app import create_app
 
 app = create_app()
 
+# Agregar
 if __name__ == '__main__':
-    app.run(host="3.138.137.16")
+    app.run(debug=True, host="0.0.0.0")
