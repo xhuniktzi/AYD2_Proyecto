@@ -1,8 +1,8 @@
-"""Consolidate model
+"""Consolidando final model
 
-Revision ID: 0479851a8196
+Revision ID: 27654e4e2d61
 Revises: 
-Create Date: 2024-09-30 19:14:02.532901
+Create Date: 2024-09-30 20:45:27.211357
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '0479851a8196'
+revision = '27654e4e2d61'
 down_revision = None
 branch_labels = None
 depends_on = None

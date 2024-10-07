@@ -10,7 +10,7 @@ def get_current_user():
     current_user_id = get_jwt_identity()
     return User.query.get(current_user_id)
 
-def read_config(name: str) -> str:
+def read_config(name: str) -> str | None:
     config = ConfigControl.query.filter_by(name=name).first()
 
     if config:
@@ -45,7 +45,7 @@ def obtener_fechas():
     
     return fecha_actual, fecha_mas_24_horas
 
-def formatear_fecha(fecha_str: str) -> datetime:
+def formatear_fecha(fecha_str: str) -> datetime | None:
     try:
         return datetime.strptime(fecha_str, "%d/%m/%Y")
     except ValueError:
