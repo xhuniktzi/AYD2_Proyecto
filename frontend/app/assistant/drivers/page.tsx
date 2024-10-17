@@ -108,8 +108,8 @@ export default function DriverPage() {
             ))}
           <h2 className="text-lg font-bold mt-5">Viajes</h2>
           <hr className="border-black mb-3" />
-          {driverDetails.trips.length > 0 ? (
-            driverDetails.trips.map((trip) => (
+          {driverDetails.trips!.length > 0 ? (
+            driverDetails.trips!.map((trip) => (
               <div key={trip.id}>
                 <Card>
                   <CardHeader>

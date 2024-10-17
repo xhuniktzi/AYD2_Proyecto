@@ -1,18 +1,21 @@
 'use client'
+
 import { useState } from 'react'
 import { axiosInstance } from '@/tools/api'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { IMessageRes } from '@/models/IMessageRes'
 import { AxiosError } from 'axios'
+import dynamic from 'next/dynamic'
 
-export default function VerifyAccountPage() {
+// Envolver el componente con `dynamic` para que se ejecute solo en el cliente
+const VerifyAccountPage = () => {
     const [message, setMessage] = useState('')
     const [errorMsg, setErrorMsg] = useState('')
     const [isVerifying, setIsVerifying] = useState(false)
     const router = useRouter()
     const searchParams = useSearchParams()
 
-    // Get the token from query parameters
+    // Obtener el token de los parámetros de la URL
     const token = searchParams.get('token') || ''
 
     async function handleVerifyAccount() {
@@ -97,3 +100,6 @@ export default function VerifyAccountPage() {
         </>
     )
 }
+
+export default dynamic(() => Promise.resolve(VerifyAccountPage), { ssr: false })
+

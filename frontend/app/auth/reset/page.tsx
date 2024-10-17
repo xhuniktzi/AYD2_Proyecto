@@ -5,15 +5,18 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { IResetReq } from '@/models/IResetReq'
 import { IMessageRes } from '@/models/IMessageRes'
 import { AxiosError } from 'axios'
+import dynamic from 'next/dynamic'
 
-export default function ResetPasswordPage() {
+
+// Envolver el componente con `dynamic` para que se ejecute solo en el cliente
+const ResetPasswordPage = () => {
     const [newPassword, setNewPassword] = useState('')
     const [errorMsg, setErrorMsg] = useState('')
     const [showModal, setShowModal] = useState(false)
     const router = useRouter()
     const searchParams = useSearchParams()
 
-    // Get the token from query parameters
+    // Obtener el token de los parámetros de la URL
     const token = searchParams.get('token') || ''
 
     async function handleResetPassword(event: React.FormEvent<HTMLFormElement>) {
@@ -25,9 +28,7 @@ export default function ResetPasswordPage() {
         }
 
         try {
-            //   const response = 
             await axiosInstance.post<IMessageRes>('/auth/reset_password', resetData)
-            // Show success modal
             setShowModal(true)
         } catch (error) {
             const axiosError = error as AxiosError<IMessageRes>
@@ -41,10 +42,8 @@ export default function ResetPasswordPage() {
         }
     }
 
-    // Function to handle modal close
     const handleModalClose = () => {
         setShowModal(false)
-        // Redirect to login page
         router.push('/auth/login')
     }
 
@@ -109,3 +108,5 @@ export default function ResetPasswordPage() {
         </>
     )
 }
+
+export default dynamic(() => Promise.resolve(ResetPasswordPage), { ssr: false })
