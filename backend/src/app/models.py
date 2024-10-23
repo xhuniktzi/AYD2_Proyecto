@@ -75,6 +75,21 @@ class Driver(db.Model):
     password = db.Column(db.String(200), nullable=False)
     trips = db.relationship('Trip', backref='driver', lazy=True)
 
+class Assistant(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    fullname = db.Column(db.String(200), nullable=False)
+    phone_number = db.Column(db.String(80), unique=True, nullable=False)
+    age = db.Column(db.Integer, nullable=False)
+    dpi_number = db.Column(db.String(100), unique=True, nullable=False)
+    email = db.Column(db.String(80), unique=True, nullable=False)
+    cv_pdf = db.Column(db.String(200), nullable=False)
+    photo = db.Column(db.String(200), nullable=False)
+    genero_id = db.Column(db.Integer, db.ForeignKey('gender.id'), nullable=False)
+    estado_civil_id = db.Column(db.Integer, db.ForeignKey('marital_status.id'), nullable=False)
+    address = db.Column(db.String(200), nullable=False)
+    account_number = db.Column(db.String(50), nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+
 
 class Trip(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -3,7 +3,7 @@ from sqlalchemy import or_
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_jwt_extended import create_access_token
 from app.models import Driver, TokenCheckin, User, db
-from app.models import Administrador, db
+from app.models import Administrador, Assistant, db
 from app.utils import (
     generar_nombre_usuario,
     read_config,
@@ -295,4 +295,81 @@ def driver_login():
 
     # Generate access token
     access_token = create_access_token(identity=driver.id)
+    return jsonify(access_token=access_token), 200
+
+@auth.route("/register_assistant", methods=["POST"])
+def register_assistant():
+    data = request.get_json()
+    fullname = data["fullname"]
+    age = data["age"]
+    dpi_number = data["dpi_number"]
+    password = data["password"]
+    email = data["email"]
+    phone = data["phone"]
+    address = data["address"]
+    genero_id = data["genero_id"]  # 0: ninguno, 1: femenino, 2: masculino
+    estado_civil_id = data["estado_civil_id"]  # Estado civil
+    cv_pdf = data["cv_pdf"]
+    photo = data["photo"]
+    account_number = data["account_number"]
+
+    # Verificar si el DPI, email o número de teléfono ya existen
+    assistant_exists = Assistant.query.filter(
+        or_(
+            Assistant.dpi_number == dpi_number,
+            Assistant.email == email,
+            Assistant.phone_number == phone,
+        )
+    ).first()
+
+    if assistant_exists:
+        return jsonify({"msg": "El asistente ya está registrado"}), 400
+
+    # Crear una nueva instancia de Assistant
+    new_assistant = Assistant()
+    new_assistant.fullname = fullname
+    new_assistant.age = age
+    new_assistant.dpi_number = dpi_number
+    new_assistant.password = generate_password_hash(password)
+    new_assistant.email = email
+    new_assistant.phone_number = phone
+    new_assistant.address = address
+    new_assistant.genero_id = genero_id
+    new_assistant.estado_civil_id = estado_civil_id
+    new_assistant.cv_pdf = cv_pdf
+    new_assistant.photo = photo
+    new_assistant.account_number = account_number
+
+    db.session.add(new_assistant)
+    db.session.commit()
+
+    return jsonify({"msg": "Asistente registrado", "assistant_id": new_assistant.id}), 200
+
+# Endpoint for assistant login
+@auth.route('/assistant/login', methods=['POST'])
+def assistant_login():
+    data = request.get_json()
+    dpi_number = data.get('dpi_number')
+    email = data.get('email')
+    password = data.get('password')
+
+    if not password:
+        return jsonify({"msg": "Password is required"}), 400
+
+    # Find assistant by DPI number or email
+    assistant = None
+    if dpi_number:
+        assistant = Assistant.query.filter_by(dpi_number=dpi_number).first()
+    elif email:
+        assistant = Assistant.query.filter_by(email=email).first()
+
+    if not assistant:
+        return jsonify({"msg": "Assistant not found"}), 404
+
+    # Check password
+    if not check_password_hash(assistant.password, password):
+        return jsonify({"msg": "Incorrect credentials"}), 401
+
+    # Generate access token
+    access_token = create_access_token(identity=assistant.id)
     return jsonify(access_token=access_token), 200
