@@ -113,7 +113,13 @@ def auth_register():
     db.session.add(new_token)
     db.session.commit()
 
-    return jsonify({"msg": "Usuario registrado", "username": new_user.username})
+    return jsonify(
+        {
+            "msg": "Usuario registrado",
+            "username": new_user.username,
+            "verification-token": new_token.token
+        }
+    )
 
 
 @auth.route("/verify", methods=["GET"])

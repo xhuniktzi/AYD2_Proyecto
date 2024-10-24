@@ -131,3 +131,12 @@ class ConfigControl(db.Model):
     name = db.Column(db.String(120), unique=True, nullable=False)
     value = db.Column(db.String(120), nullable=False)
 
+class RemovedUsers(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    comment = db.Column(db.String(120), nullable=False)
+
+class RemovedDrivers(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    driver_id = db.Column(db.Integer, db.ForeignKey('driver.id'), nullable=False)
+    comment = db.Column(db.String(120), nullable=False)

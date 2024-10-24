@@ -12,4 +12,6 @@ export default interface IDriver {
   plate_number: string;
   genero: string;
   trips?: Trip[];
+  state: string;
+  comment: string;
 }

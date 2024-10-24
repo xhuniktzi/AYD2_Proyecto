@@ -7,4 +7,5 @@ export default interface IUser {
   email: string;
   phone_number: string;
   state: string;
+  comment?: string;
 }

@@ -4,20 +4,20 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
 from app.models import User, ConfigControl
+from sqlalchemy.exc import NoResultFound
+from typing import Optional, cast
 
 def get_current_user():
     verify_jwt_in_request()
     current_user_id = get_jwt_identity()
     return User.query.get(current_user_id)
 
-def read_config(name: str) -> str | None:
-    config = ConfigControl.query.filter_by(name=name).first()
+def read_config(name: str) -> str:
+    config = cast(Optional[ConfigControl], ConfigControl.query.filter_by(name=name).first())
+    if not config:
+        raise NoResultFound(f'<{name}> not found in config_control table')
+    return config.value
 
-    if config:
-        return config.value
-    else:
-        return None
-    
 def generar_token_verificacion():
     return secrets.token_hex(16)  # Genera un token de 128 bits en hexadecimal
 

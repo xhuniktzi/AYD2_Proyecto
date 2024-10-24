@@ -6,6 +6,7 @@ VALUES
 INSERT INTO public.config_control ("name",value) VALUES
 	 ('user-active','1'),
 	 ('user-not-checkin','2'),
+	 ('user-removed', '3'),
 	 ('trip-pending','1'),
 	 ('trip-canceled','2'),
 	 ('trip-complete','4'),	 
@@ -19,11 +20,13 @@ INSERT INTO public.gender ("name",abreviature) VALUES
 
 INSERT INTO public.user_state ("name") VALUES
 	 ('active'),
-	 ('not-checkin');
+	 ('not-checkin'),
+	 ('removed');
 
 INSERT INTO public.driver_state ("name") VALUES
 	 ('active'),
-	 ('not-checkin');
+	 ('not-checkin'),
+	 ('removed');
 
 INSERT INTO public.marital_status ("name") VALUES
 	('soltero'),

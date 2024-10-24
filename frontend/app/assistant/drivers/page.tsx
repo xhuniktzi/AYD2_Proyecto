@@ -27,6 +27,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { User as UserIcon, MapPin, MapPinCheckInside } from "lucide-react";
@@ -35,6 +42,7 @@ export default function DriverPage() {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [errMsg, setErrMsg] = useState("");
   const [open, setOpen] = useState(false);
+  const [dialog_open, set_dialog_open] = useState(false);
   const [driverDetails, setDriverDetails] = useState<Driver>({
     driver_id: "",
     fullname: "",
@@ -47,6 +55,8 @@ export default function DriverPage() {
     plate_number: "",
     age: "",
     trips: [],
+    state: "",
+    comment: "",
   });
 
   useEffect(() => {
@@ -82,12 +92,73 @@ export default function DriverPage() {
     }
   }
 
+  async function deleteUser(formData) {
+    const data = {
+      id: driverDetails.driver_id,
+      comment: formData.get("comment"),
+    };
+    await axiosInstance.post("/assistant/drivers", data);
+    setDrivers(
+      drivers.map((driver) => {
+        if (driver.driver_id === driverDetails.driver_id) {
+          driver.state = "removed";
+        }
+        return driver;
+      })
+    );
+    set_dialog_open(false);
+    setOpen(false);
+  }
+
+  function DeleteState() {
+    if (driverDetails.state === "removed") {
+      return (
+        <div>
+          <h2 className="font-bold text-lg mt-3">Motivo eliminación</h2>
+          <p className="text-red-800 border-black border-2 py-3 px-1">
+            {driverDetails.comment}
+          </p>
+        </div>
+      );
+    }
+    return (
+      <Button
+        variant={"destructive"}
+        className="mt-3"
+        onClick={() => set_dialog_open(true)}
+      >
+        Eliminar conductor
+      </Button>
+    );
+  }
+
   return (
     <>
+      <Dialog open={dialog_open} onOpenChange={set_dialog_open}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Eliminar conductor de la plataforma</DialogTitle>
+            <DialogDescription>
+              Provee un comentario para justificar esta acción
+            </DialogDescription>
+          </DialogHeader>
+          <form className="flex flex-col gap-3" action={deleteUser}>
+            <textarea
+              rows={10}
+              name="comment"
+              required
+              className="border-black border-2"
+            ></textarea>
+            <Button variant={"destructive"} type="submit">
+              Eliminar
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent>
+        <SheetContent className="overflow-y-scroll">
           <SheetHeader className="mb-5">
-            <SheetTitle>Detalle cliente</SheetTitle>
+            <SheetTitle>Detalle conductor</SheetTitle>
           </SheetHeader>
           <div className="flex">
             <UserIcon />
@@ -96,7 +167,10 @@ export default function DriverPage() {
           {Object.entries(driverDetails)
             .filter(
               ([key, _]) =>
-                key !== "fullname" && key !== "driver_id" && key !== "trips"
+                key !== "fullname" &&
+                key !== "driver_id" &&
+                key !== "trips" &&
+                key !== "comment"
             )
             .map(([key, value]) => (
               <div key={key}>
@@ -106,6 +180,7 @@ export default function DriverPage() {
                 <p className="text-sm">{value}</p>
               </div>
             ))}
+          <DeleteState></DeleteState>
           <h2 className="text-lg font-bold mt-5">Viajes</h2>
           <hr className="border-black mb-3" />
           {driverDetails.trips!.length > 0 ? (
@@ -136,11 +211,10 @@ export default function DriverPage() {
             <p>No hay viajes</p>
           )}
           <hr className="border-2 my-3" />
-          <Button variant={"destructive"}>Eliminar cliente</Button>
         </SheetContent>
       </Sheet>
 
-      <h1 className="text-lg font-bold">Users</h1>
+      <h1 className="text-lg font-bold">Conductores</h1>
       {errMsg && (
         <Alert variant="destructive">
           <AlertTitle>Error</AlertTitle>
@@ -152,6 +226,7 @@ export default function DriverPage() {
           <TableHeader>
             <TableRow>
               <TableHead>id</TableHead>
+              <TableHead>status</TableHead>
               <TableHead>Nombre</TableHead>
               <TableHead>email</TableHead>
             </TableRow>
@@ -160,6 +235,7 @@ export default function DriverPage() {
             {drivers.map((driver) => (
               <TableRow key={driver.driver_id}>
                 <TableCell>{driver.driver_id}</TableCell>
+                <TableCell>{driver.state}</TableCell>
                 <TableCell>
                   <Button
                     variant={"link"}

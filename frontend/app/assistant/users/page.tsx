@@ -28,6 +28,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { User as UserIcon, MapPin, MapPinCheckInside } from "lucide-react";
@@ -37,6 +44,7 @@ export default function UserPage() {
   const [userTrips, setUserTrips] = useState<Trip[]>([]);
   const [errMsg, setErrMsg] = useState("");
   const [open, setOpen] = useState(false);
+  const [dialog_open, set_dialog_open] = useState(false);
   const [userDetails, setUserDetails] = useState<User>({
     id: 0,
     fullname: "",
@@ -46,6 +54,7 @@ export default function UserPage() {
     email: "",
     phone_number: "",
     state: "",
+    comment: "",
   });
 
   useEffect(() => {
@@ -97,10 +106,71 @@ export default function UserPage() {
     }
   }
 
+  async function deleteUser(formData) {
+    const data = {
+      id: userDetails.id,
+      comment: formData.get("comment"),
+    };
+    await axiosInstance.post("/assistant/users", data);
+    setUsers(
+      users.map((user) => {
+        if (user.id === userDetails.id) {
+          user.state = "removed";
+        }
+        return user;
+      })
+    );
+    set_dialog_open(false);
+    setOpen(false);
+  }
+
+  function DeleteState() {
+    if (userDetails.state === "removed") {
+      return (
+        <div>
+          <h2 className="font-bold text-lg mt-3">Motivo eliminación</h2>
+          <p className="text-red-800 border-black border-2 py-3 px-1">
+            {userDetails.comment}
+          </p>
+        </div>
+      );
+    }
+    return (
+      <Button
+        variant={"destructive"}
+        className="mt-3"
+        onClick={() => set_dialog_open(true)}
+      >
+        Eliminar cliente
+      </Button>
+    );
+  }
+
   return (
     <>
+      <Dialog open={dialog_open} onOpenChange={set_dialog_open}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Eliminar usuario de la plataforma</DialogTitle>
+            <DialogDescription>
+              Provee un comentario para justificar esta acción
+            </DialogDescription>
+          </DialogHeader>
+          <form className="flex flex-col gap-3" action={deleteUser}>
+            <textarea
+              rows={10}
+              name="comment"
+              required
+              className="border-black border-2"
+            ></textarea>
+            <Button variant={"destructive"} type="submit">
+              Eliminar
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent>
+        <SheetContent className="overflow-y-scroll">
           <SheetHeader className="mb-5">
             <SheetTitle>Detalle cliente</SheetTitle>
           </SheetHeader>
@@ -109,7 +179,10 @@ export default function UserPage() {
             <h2 className="text-lg font-bold">{userDetails.fullname}</h2>
           </div>
           {Object.entries(userDetails)
-            .filter(([key, _]) => key !== "fullname" && key !== "id")
+            .filter(
+              ([key, _]) =>
+                key !== "fullname" && key !== "id" && key !== "comment"
+            )
             .map(([key, value]) => (
               <div key={key}>
                 <h3 className="text font-semibold">
@@ -118,6 +191,7 @@ export default function UserPage() {
                 <p className="text-sm">{value}</p>
               </div>
             ))}
+          <DeleteState></DeleteState>
           <h2 className="text-lg font-bold mt-5">Viajes</h2>
           <hr className="border-black mb-3" />
           {userTrips.length > 0 ? (
@@ -148,11 +222,9 @@ export default function UserPage() {
             <p>No hay viajes</p>
           )}
           <hr className="border-2 my-3" />
-          <Button variant={"destructive"}>Eliminar cliente</Button>
         </SheetContent>
       </Sheet>
-
-      <h1 className="text-lg font-bold">Users</h1>
+      <h1 className="text-lg font-bold">Usuarios</h1>
       {errMsg && (
         <Alert variant="destructive">
           <AlertTitle>Error</AlertTitle>
@@ -164,6 +236,7 @@ export default function UserPage() {
           <TableHeader>
             <TableRow>
               <TableHead>id</TableHead>
+              <TableHead>status</TableHead>
               <TableHead>Nombre</TableHead>
               <TableHead>email</TableHead>
             </TableRow>
@@ -172,6 +245,7 @@ export default function UserPage() {
             {users.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>{user.id}</TableCell>
+                <TableCell>{user.state}</TableCell>
                 <TableCell>
                   <Button
                     variant={"link"}
