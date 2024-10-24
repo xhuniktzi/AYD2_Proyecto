@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import  jwt_required
 
 from sqlalchemy import and_
 from app.models import DriverState, User, Driver, Gender, UserState, Trip, TripState, RemovedUsers, RemovedDrivers
@@ -9,6 +10,7 @@ from typing import Optional, TypedDict, cast
 assistant = Blueprint('assistant', __name__)
 
 @assistant.route('/applicants', methods=['GET'])
+@jwt_required()
 def get_applicants():
     '''
     Endpoint to get current applicants
@@ -24,6 +26,7 @@ def get_applicants():
     }, applicants)))
 
 @assistant.route('/applicants/<id>/hire', methods=['PATCH'])
+@jwt_required()
 def hire_applicant(id: str):
     '''
     Endpoint to hire a driver
@@ -37,6 +40,7 @@ def hire_applicant(id: str):
     return jsonify({'msg': 'Updated applicant status'})
 
 @assistant.route('/drivers', methods=['GET'])
+@jwt_required()
 def get_drivers():
     '''
     Endpoint to get the list of drivers
@@ -51,6 +55,7 @@ def get_drivers():
     }, drivers)))
 
 @assistant.route('/drivers/<id>', methods=['GET'])
+@jwt_required()
 def get_driver(id: str):
     '''
     Endpoint to get a driver by account id
@@ -84,6 +89,7 @@ def get_driver(id: str):
     })
 
 @assistant.route('/users', methods=['GET'])
+@jwt_required()
 def get_users():
     '''
     Endpoint to get the list of users
@@ -97,6 +103,7 @@ def get_users():
     }, users)))
 
 @assistant.route('/users/<id>', methods=['GET'])
+@jwt_required()
 def get_user(id: str):
     '''
     Endpoint to get a user's info
@@ -119,6 +126,7 @@ def get_user(id: str):
     })
 
 @assistant.route('/users/<id>/trips', methods=['GET'])
+@jwt_required()
 def get_user_trips(id: str):
     '''
     Endpoint to get a user's trips
@@ -140,6 +148,7 @@ class DeleteRequest(TypedDict):
     comment: str
 
 @assistant.route('/users/', methods=['POST'])
+@jwt_required()
 def delete_user():
     '''
     Endpoint to delete a user
@@ -159,6 +168,7 @@ def delete_user():
     return jsonify({'msg': "Deleted user"})
 
 @assistant.route('/drivers/', methods=['POST'])
+@jwt_required()
 def delete_driver():
     '''
     Endpoint to delete a driver
