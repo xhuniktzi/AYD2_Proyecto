@@ -1,22 +1,22 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance } from "axios";
 
 export const axiosInstance: AxiosInstance = axios.create({
-    baseURL: 'http://localhost:5000/api',
-    timeout: 5000,
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
+  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL + "/api",
+  timeout: 5000,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
-  // Interceptor de Axios para agregar el token JWT a cada petición
+// Interceptor de Axios para agregar el token JWT a cada petición
 axiosInstance.interceptors.request.use(
   (config) => {
     // Obtener el token de localStorage o sessionStorage
-    const token = localStorage.getItem('access_token');
-    
+    const token = localStorage.getItem("access_token");
+
     if (token) {
       // Si hay un token, se agrega a los headers de Authorization
-      config.headers['Authorization'] = `Bearer ${token}`;
+      config.headers["Authorization"] = `Bearer ${token}`;
     }
     return config;
   },
