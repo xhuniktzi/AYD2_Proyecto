@@ -1,9 +1,26 @@
 services:
   backend:
+    profiles: [prod]
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: backend_service
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgresql://sa:database123!@db:5432/uberfake
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  backend.dev:
+    profiles: [dev]
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: backend_service.dev
     ports:
       - "5000:5000"
     environment:
@@ -20,10 +37,24 @@ services:
       - app-network
 
   frontend:
+    profiles: [prod]
     build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: frontend_service
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  frontend.dev:
+    profiles: [dev]
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: frontend_service.dev
     ports:
       - "3000:3000"
     develop:
@@ -32,7 +63,7 @@ services:
           path: ./frontend/
           target: /app
     depends_on:
-      - backend
+      - backend.dev
     networks:
       - app-network
 

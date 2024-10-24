@@ -1,0 +1,18 @@
+#!/bin/bash
+
+function dev() {
+	export COMPOSE_PROFILES=dev
+	docker compose up --build --watch
+}
+
+function prod() {
+	export COMPOSE_PROFILES=prod
+	docker compose up --build
+}
+
+function clean() {
+	export COMPOSE_PROFILES=prod,dev
+	docker compose down -v
+}
+
+eval "$@"
