@@ -55,19 +55,15 @@ def auth_login():
         or_(User.username == username, User.email == email)
     ).first()
 
-    if not user:
-        return jsonify({"msg": "Bad credentials"}), 401
-
+    if not user or not check_password_hash(user.password, password):
+        return jsonify({"msg": "Usuario o contraseña incorrecta"}), 401
     if user.state_id == int(read_config("user-not-checkin")):
-        return jsonify({"msg": "Usuario no verificado"}), 401
+        return jsonify({"msg": "Usuario no verificado"}), 403
+    if user.state_id == int(read_config("user-removed")):
+        return jsonify({"msg": "Este usuario está baneado"}), 403
 
-    if check_password_hash(user.password, password) and user.state_id == int(
-        read_config("user-active")
-    ):
-        access_token = create_access_token(identity=user.id)
-        return jsonify(access_token=access_token), 200
-    else:
-        return jsonify({"msg": "Bad credentials"}), 401
+    access_token = create_access_token(identity=user.id)
+    return jsonify(access_token=access_token), 200
 
 
 @auth.route("/register", methods=["POST"])
