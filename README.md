@@ -470,3 +470,6 @@ Se usará para “esconder” la llamada de multiples querys a la base de datos 
 ## Diagrama de despliegue
 
 ![diagrama](assets/diagrama_despliegue.png)
+
+## Pruebas de Aceptación
+Pruebas de Aceptación QNave [Accept_Test](https://documenter.getpostman.com/view/29638578/2sAY4sj4cD).
