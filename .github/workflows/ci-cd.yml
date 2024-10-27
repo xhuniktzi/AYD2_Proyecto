@@ -29,26 +29,12 @@ jobs:
       run: |
         docker push xhuniktzi/backend-ayd2:latest
 
-  # test:
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - name: Checkout Código
-  #     uses: actions/checkout@v3
-
-  #   - name: Iniciar Docker
-  #     uses: docker/setup-docker@v1
-
-  #   - name: Correr Pruebas
-  #     run: |
-  #       docker run --rm xhuniktzi/backend-ayd2:latest pytest  # Ajusta según tus pruebas
-
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
     - name: Descargar Clave SSH
-      uses: webfactory/ssh-agent@v0.5.3
+      uses: webfactory/ssh-agent@v0.7.0 # Actualizado a una versión más reciente
       with:
         ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
