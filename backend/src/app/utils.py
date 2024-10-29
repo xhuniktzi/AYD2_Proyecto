@@ -3,7 +3,7 @@ import random
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
-from app.models import User, ConfigControl
+from app.models import User, ConfigControl, Driver
 from sqlalchemy.exc import NoResultFound
 from typing import Optional, cast
 
@@ -11,6 +11,11 @@ def get_current_user():
     verify_jwt_in_request()
     current_user_id = get_jwt_identity()
     return User.query.get(current_user_id)
+
+def get_current_driver():
+    verify_jwt_in_request()
+    current_driver_id = get_jwt_identity()
+    return Driver.query.get(current_driver_id)
 
 def read_config(name: str) -> str:
     config = cast(Optional[ConfigControl], ConfigControl.query.filter_by(name=name).first())
