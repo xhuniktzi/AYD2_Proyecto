@@ -3,7 +3,7 @@ import { axiosInstance } from "@/tools/api";
 import { AxiosError } from "axios";
 import Driver from "@/models/AssistantDriversRes";
 import { IMessageRes } from "@/models/IMessageRes";
-import { useState, useEffect } from "react";
+import { useState, useEffect, SetStateAction } from "react";
 
 import {
   Table,
@@ -62,10 +62,10 @@ export default function DriverPage() {
   useEffect(() => {
     axiosInstance
       .get<Driver[]>("/assistant/drivers")
-      .then((response) => {
+      .then((response: { data: SetStateAction<Driver[]>; }) => {
         setDrivers(response.data);
       })
-      .catch((error) => {
+      .catch((error: any) => {
         const axiosError = error as AxiosError<IMessageRes>;
         if (axiosError.response) {
           setErrMsg(axiosError.response.data.msg);
@@ -92,7 +92,7 @@ export default function DriverPage() {
     }
   }
 
-  async function deleteUser(formData) {
+  async function deleteUser(formData: any) {
     const data = {
       id: driverDetails.driver_id,
       comment: formData.get("comment"),

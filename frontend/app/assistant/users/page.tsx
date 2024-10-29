@@ -4,7 +4,7 @@ import { AxiosError } from "axios";
 import User from "@/models/IUser";
 import Trip from "@/models/AssistantUsersTripsRes";
 import { IMessageRes } from "@/models/IMessageRes";
-import { useState, useEffect } from "react";
+import { useState, useEffect, SetStateAction } from "react";
 
 import {
   Table,
@@ -60,11 +60,11 @@ export default function UserPage() {
   useEffect(() => {
     axiosInstance
       .get<User[]>("/assistant/users")
-      .then((response) => {
+      .then((response: { data: SetStateAction<User[]>; }) => {
         console.log(response.data);
         setUsers(response.data);
       })
-      .catch((error) => {
+      .catch((error: any) => {
         const axiosError = error as AxiosError<IMessageRes>;
         if (axiosError.response) {
           setErrMsg(axiosError.response.data.msg);
@@ -106,7 +106,7 @@ export default function UserPage() {
     }
   }
 
-  async function deleteUser(formData) {
+  async function deleteUser(formData: any) {
     const data = {
       id: userDetails.id,
       comment: formData.get("comment"),

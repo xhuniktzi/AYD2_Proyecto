@@ -10,15 +10,32 @@
     state: present
   become: true
 
+- name: Ensure app directory exists
+  file:
+    path: /home/ubuntu/app
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Create .env file for Docker container
+  copy:
+    dest: /home/ubuntu/app/.env  
+    content: |
+      NEXT_PUBLIC_BACKEND_URL=http://3.22.164.235:5000
+  become: true
+
 - name: Pull frontend Docker image
   docker_image:
-    name: codeprentice/ayd2-frontend:v1
+    name: codeprentice/ayd2-frontend:v3
     pull: yes
 
 - name: Run frontend container
   docker_container:
     name: frontend
-    image: codeprentice/ayd2-frontend:v1
+    image: codeprentice/ayd2-frontend:v3
     state: started
     ports:
       - "3000:3000"
+    env_file: /home/ubuntu/app/.env  
+  become: true
+

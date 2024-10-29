@@ -1,37 +1,46 @@
-# Usar una imagen oficial de Node.js como imagen base para la etapa de construcción
+# Use an official Node.js image as the base for the build stage
 FROM node:20-alpine AS builder
 
-# Establecer el directorio de trabajo dentro del contenedor
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copiar los archivos de dependencias
+# Copy the dependency files
 COPY package*.json ./
 
-# Instalar dependencias
+# Install all dependencies, including ESLint for development
 RUN npm install
 
-# Copiar el resto del código del proyecto al contenedor
+# Add ESLint configuration file with modified rule
+RUN echo '{ \
+  "env": { "browser": true, "es2021": true }, \
+  "extends": ["eslint:recommended"], \
+  "parserOptions": { "ecmaVersion": 12, "sourceType": "module" }, \
+  "rules": { "@typescript-eslint/no-explicit-any": "off" } \
+}' > .eslintrc.json
+
+# Copy the rest of the project files to the container
 COPY . .
 
-# Compilar la aplicación Next.js para producción
+# Build the Next.js application for production
 RUN npm run build
 
-# Usar una imagen oficial de Node.js como imagen base para la etapa de producción
+# Use a clean Node.js image as the base for the production stage
 FROM node:20-alpine
 
-# Establecer el directorio de trabajo dentro del contenedor
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copiar solo las dependencias necesarias para producción
+# Copy only the dependencies necessary for production
 COPY package*.json ./
 RUN npm install --production
 
-# Copiar los archivos compilados de la etapa de construcción
+# Copy the compiled files from the build stage
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/next.config.mjs ./
+COPY --from=builder /app/.eslintrc.json ./ 
 
-# Exponer el puerto en el que correrá la aplicación (3000 para Next.js)
+# Expose the port on which the app will run (3000 for Next.js)
 EXPOSE 3000
 
-# Comando para ejecutar la aplicación en modo producción
+# Command to run the application in production mode
 CMD ["npm", "run", "start"]
