@@ -117,7 +117,10 @@ def get_user_info_by_trip(trip_id):
         "fecha_nac": user.fecha_nac.strftime('%Y-%m-%d'),
         "email": user.email,
         "phone_number": user.phone_number,
-        "genero_id": user.genero_id
+        "genero_id": user.genero_id,
+        "tarifa": trip.tarifa,
+        "origin": trip.origin,
+        "destination": trip.destination
     }
 
     return jsonify(user_info), 200

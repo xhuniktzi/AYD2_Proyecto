@@ -81,7 +81,7 @@ export default function DriverTripPage() {
             <p><strong>Origin:</strong> {tripInfo.origin}</p>
             <p><strong>Destination:</strong> {tripInfo.destination}</p>
             <p><strong>Tarifa:</strong> Q{tripInfo.tarifa}</p>
-            <p><strong>Full name: </strong> {tripInfo.user_fullname}</p>
+            <p><strong>Full name: </strong> {tripInfo.fullname}</p>
             <p><strong>Email:</strong> {tripInfo.email}</p>
             <p><strong>Phone Number:</strong> {tripInfo.phone_number}</p>
             <button
