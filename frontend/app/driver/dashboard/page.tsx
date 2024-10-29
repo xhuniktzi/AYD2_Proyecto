@@ -39,6 +39,14 @@ export default function TripInfoListPage() {
     }
   }
 
+  async function handleActionsTrip(tripId: number) {
+    try {
+      router.push(`/driver/driver_trip/${tripId}`)
+    } catch (error) {
+      setErrorMsg('An unexpected error occurred.');
+    }
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-4xl p-8 space-y-6 bg-white shadow-md rounded-lg">
@@ -62,11 +70,35 @@ export default function TripInfoListPage() {
                 <td className="border px-4 py-2">{trip.destination}</td>
                 <td className="border px-4 py-2">Q{trip.tarifa}</td>
                 <td className="border px-4 py-2">
+                  { trip.status == 1 ? ( //pendiente
                   <button
                     onClick={() => handleAcceptTrip(trip.trip_id)}
                     className="py-2 px-4 border rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">
                     Accept Trip
+                  </button>)
+                  : trip.status == 2 ? ( //Cancelado
+                    <button
+                    className="py-2 px-4 border rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">
+                    Canceled
+                  </button>)
+                  : trip.status == 3 ? ( // En progreso
+                    <>
+                      <button
+                    className="py-2 px-4 border rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                    Indrive
                   </button>
+                  <button
+                  onClick={() => handleActionsTrip(trip.trip_id)}
+                  className="py-2 px-4 border rounded-md shadow-sm text-sm font-medium text-white bg-cyan-600 hover:bg-blue-700">
+                  Actions
+                </button>
+                    </>
+                    )
+                  : ( // Completado
+                    <button
+                    className="py-2 px-4 border rounded-md shadow-sm text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700">
+                    Completed
+                  </button>)}
                 </td>
               </tr>
             ))}

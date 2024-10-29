@@ -1,5 +1,7 @@
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import  jwt_required
 from app.models import Driver, Trip, ProblemReport,User, db
+from app.utils import get_current_driver
 from datetime import datetime
 
 from app.utils import read_config
@@ -7,8 +9,12 @@ from app.utils import read_config
 driver = Blueprint("driver", __name__)
 #Obtener lista de viajes
 @driver.route("/trips", methods=["GET"])
+@jwt_required()
 def get_trips():
-    trips = Trip.query.all()
+    driverId = get_current_driver().id
+    trips_pending = Trip.query.filter_by(status=int(read_config('trip-pending')))
+    trips_driver = Trip.query.filter_by(driver_id=driverId)
+    trips = trips_driver.union(trips_pending)
 
     if not trips:
         return jsonify({"msg": "No hay viajes registrados"}), 404
@@ -35,7 +41,9 @@ def get_trips():
 
 # Aceptar viaje
 @driver.route("/accept_trip", methods=["POST"])
+@jwt_required()
 def accept_trip():
+    driverId = get_current_driver().id
     data = request.get_json()
     trip_id = data.get("trip_id")
     driver_id = data.get("driver_id")
@@ -44,7 +52,7 @@ def accept_trip():
     if not trip:
         return jsonify({"msg": "Viaje no disponible o ya aceptado"}), 400
 
-    trip.driver_id = driver_id
+    trip.driver_id = driverId
     trip.status = int(read_config('trip-accept'))  # 3 = Aceptado o en progreso
     db.session.commit()
 
@@ -53,13 +61,15 @@ def accept_trip():
 
 # Cancelar viaje
 @driver.route("/cancel_trip", methods=["POST"])
+@jwt_required()
 def cancel_trip():
+    driverId = get_current_driver().id
     data = request.get_json()
     trip_id = data.get("trip_id")
     driver_id = data.get("driver_id")
     reason = data.get("reason")
 
-    trip = Trip.query.filter_by(id=trip_id, driver_id=driver_id, status=int(read_config('trip-accept'))).first()  #1 = pendiente
+    trip = Trip.query.filter_by(id=trip_id, driver_id=driverId, status=int(read_config('trip-accept'))).first()  #1 = pendiente
     #No se encontro el viaje o no se puede cancelar
     if not trip:
         return jsonify({"msg": "No se puede cancelar este viaje"}), 400
@@ -129,20 +139,22 @@ def get_user_info_by_trip(trip_id):
 
 # Finalizar viaje y recibir pago
 @driver.route("/complete_trip", methods=["POST"])
+@jwt_required()
 def end_trip():
+    driverId = get_current_driver().id
     data = request.get_json()
     trip_id = data.get("trip_id")
     driver_id = data.get("driver_id")
     payment_received = data.get("payment_received")
 
-    trip = Trip.query.filter_by(id=trip_id, driver_id=driver_id, status=int(read_config('trip-accept'))).first()  # 3 = en progreso
+    trip = Trip.query.filter_by(id=trip_id, driver_id=driverId, status=int(read_config('trip-accept'))).first()  # 3 = en progreso
     if not trip:
         return jsonify({"msg": "No se puede finalizar este viaje"}), 400
 
     trip.end_time = datetime.now()
     trip.status = 4  # 4 = finalizado
     trip.payment_received = payment_received
-    db.session.delete(trip)
+    # db.session.delete(trip)
     db.session.commit()
 
     return jsonify({"msg": "Viaje finalizado"}), 200
